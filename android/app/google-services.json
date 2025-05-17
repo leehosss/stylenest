@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "956589351265",
+    "project_id": "stylenest-8c7c2",
+    "storage_bucket": "stylenest-8c7c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956589351265:android:fea6d3e677a1f928d22520",
+        "android_client_info": {
+          "package_name": "com.example.stylenest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZVq_zN7adNZ9dYnvS3KVnjQCB7homVXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
