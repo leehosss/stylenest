@@ -4,64 +4,86 @@ import 'package:flutter/foundation.dart';
 import 'cart_item.dart';
 
 class CartModel extends ChangeNotifier {
+  // key: "productId|size|color"
   final Map<String, CartItem> _items = {};
 
   List<CartItem> get items => _items.values.toList();
 
-  /// 총 합계 가격
   int get totalPrice =>
       _items.values
           .fold(0, (sum, item) => sum + item.price * item.quantity);
 
-  /// 장바구니에 담기
   void addItem({
     required String productId,
     required String name,
     required String imageUrl,
     required int price,
+    required String size,
+    required String color,
     int quantity = 1,
   }) {
-    if (_items.containsKey(productId)) {
+    final key = _makeKey(productId, size, color);
+
+    if (_items.containsKey(key)) {
       _items.update(
-        productId,
+        key,
             (existing) =>
             existing.copyWith(quantity: existing.quantity + quantity),
       );
     } else {
-      _items[productId] = CartItem(
+      _items[key] = CartItem(
         productId: productId,
         name: name,
         imageUrl: imageUrl,
         price: price,
         quantity: quantity,
+        size: size,
+        color: color,
       );
     }
+
     notifyListeners();
   }
 
-  /// 수량 변경
-  void updateQuantity(String productId, int quantity) {
-    if (!_items.containsKey(productId)) return;
+  void updateQuantity(String productId, String size, String color,
+      int quantity) {
+    final key = _makeKey(productId, size, color);
+    if (!_items.containsKey(key)) return;
     if (quantity <= 0) {
-      _items.remove(productId);
+      _items.remove(key);
     } else {
       _items.update(
-        productId,
+        key,
             (existing) => existing.copyWith(quantity: quantity),
       );
     }
     notifyListeners();
   }
 
-  /// 삭제
-  void removeItem(String productId) {
-    _items.remove(productId);
+  void increment(String productId, String size, String color) {
+    final key = _makeKey(productId, size, color);
+    if (!_items.containsKey(key)) return;
+    final cur = _items[key]!;
+    updateQuantity(productId, size, color, cur.quantity + 1);
+  }
+
+  void decrement(String productId, String size, String color) {
+    final key = _makeKey(productId, size, color);
+    if (!_items.containsKey(key)) return;
+    final cur = _items[key]!;
+    updateQuantity(productId, size, color, cur.quantity - 1);
+  }
+
+  void removeItem(String productId, String size, String color) {
+    final key = _makeKey(productId, size, color);
+    _items.remove(key);
     notifyListeners();
   }
 
-  /// 비우기
   void clear() {
     _items.clear();
     notifyListeners();
   }
+
+  String _makeKey(String id, String size, String color) => '$id|$size|$color';
 }

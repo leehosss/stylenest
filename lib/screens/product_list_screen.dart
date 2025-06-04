@@ -1,10 +1,11 @@
-// lib/screens/product_list_screen.dart
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/products_model.dart';
+import '../models/auth_model.dart';
 import '../models/product.dart';
+import '../models/products_model.dart';
+import '../services/firestore_service.dart';
 import 'product_detail_screen.dart';
 
 class ProductListScreen extends StatelessWidget {
@@ -14,6 +15,10 @@ class ProductListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context
+        .watch<AuthModel>()
+        .user;
+    final fs = FirestoreService(userId: user?.uid);
     final model = context.watch<ProductsModel>();
     final all = model.items;
     final products = (filterCategory == null || filterCategory == '전체')
@@ -71,24 +76,56 @@ class ProductListScreen extends StatelessWidget {
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
                               const Center(
-                                  child: Icon(Icons.broken_image, size: 48)),
+                                  child: Icon(Icons.broken_image,
+                                      size: 48)),
                             ),
                           ),
+
+                          // 찜(즐겨찾기) 버튼
                           Positioned(
                             top: 8,
                             right: 8,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.8),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                    Icons.favorite_border, size: 20),
-                                onPressed: () {
-                                  // TODO: 찜 기능
-                                },
-                              ),
+                            child: StreamBuilder<bool>(
+                              stream: fs.isFavorite(p.id),
+                              initialData: false,
+                              builder: (ctx, snap) {
+                                final isFav = snap.data ?? false;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      isFav
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      size: 20,
+                                      color:
+                                      isFav ? Colors.red : Colors.grey[700],
+                                    ),
+                                    onPressed: () {
+                                      if (user == null) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                            content: Text(
+                                                '로그인이 필요합니다')));
+                                        return;
+                                      }
+                                      fs.toggleFavorite(
+                                        p.id,
+                                        {
+                                          'name': p.name,
+                                          'price': p.price,
+                                          'imageUrl': p.imageUrl,
+                                          'addedAt':
+                                          FieldValue.serverTimestamp(),
+                                        },
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],

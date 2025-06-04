@@ -42,6 +42,13 @@ dependencies:
   google_fonts: ^4.0.3
   carousel_slider: ^4.2.1
 
+
+  http: ^0.13.6
+  path_provider: ^2.0.1
+  dio: ^5.0.0
+  flutter_dotenv: ^5.0.2   # (선택) .env 로 API_URL 관리하실 경우
+  image_picker: ^0.8.7+4
+
 dependency_overrides:
   # 웹 interop이 js_interop으로 마이그레이션된 버전
   firebase_storage_web: ^3.7.0
@@ -69,6 +76,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/be/stl.png
+    - assets/icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
